@@ -97,10 +97,40 @@ async function loadShipments(customerId) {
 // Display shipments in the grid
 function displayShipments(shipments) {
     shipmentsGrid.innerHTML = '';
-    
-    shipments.forEach(shipment => {
-        const card = createShipmentCard(shipment);
-        shipmentsGrid.appendChild(card);
+
+    // Group by status
+    const groups = shipments.reduce((acc, s) => {
+        const status = (s.columns?.status || s.status || 'ללא סטטוס');
+        if (!acc[status]) acc[status] = [];
+        acc[status].push(s);
+        return acc;
+    }, {});
+
+    Object.entries(groups).forEach(([status, list]) => {
+        const section = document.createElement('div');
+        section.className = 'accordion-section';
+
+        const header = document.createElement('button');
+        header.className = 'btn btn-secondary';
+        header.style.margin = '10px 0';
+        header.textContent = `${status} (${list.length})`;
+
+        const content = document.createElement('div');
+        content.style.display = 'none';
+        content.style.marginBottom = '15px';
+
+        header.addEventListener('click', () => {
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        });
+
+        list.forEach(shipment => {
+            const card = createShipmentCard(shipment);
+            content.appendChild(card);
+        });
+
+        section.appendChild(header);
+        section.appendChild(content);
+        shipmentsGrid.appendChild(section);
     });
 }
 
@@ -143,41 +173,20 @@ function createShipmentCard(shipment) {
     const details = document.createElement('div');
     details.className = 'shipment-details';
 
-    // Display all columns dynamically
-    if (shipment.columns) {
-        Object.entries(shipment.columns).forEach(([key, value]) => {
-            // Skip status (already shown in header) and empty values
-            if (key === 'status' || !value || value === 'N/A') return;
-            
-            // Special handling for documents/links
-            if (key === 'documentUrl' && value) {
-                const link = createLinkDetail(COLUMN_LABELS[key] || key, value);
-                details.appendChild(link);
-            } else {
-                details.appendChild(createDetailItem(COLUMN_LABELS[key] || key, value));
-            }
-        });
-    }
-    
-    // Fallback for old data structure (backward compatibility)
-    else {
-        if (shipment.containerNumber) {
-            details.appendChild(createDetailItem('מס\' מכולה', shipment.containerNumber));
+    // Show only requested fields
+    const fieldsOrder = [
+        ['shipmentNumber', "מספר משלוח"],
+        ['materialCategory', "קטגוריית חומר"],
+        ['eta', "תאריך אספקה בוקינג ETA"],
+        ['containerNumber', "מס' מכולה / בוקינג"],
+    ];
+
+    fieldsOrder.forEach(([key, label]) => {
+        const value = shipment.columns?.[key];
+        if (value && value !== 'N/A') {
+            details.appendChild(createDetailItem(label, value));
         }
-        if (shipment.blNumber) {
-            details.appendChild(createDetailItem('מס\' BL', shipment.blNumber));
-        }
-        if (shipment.eta) {
-            details.appendChild(createDetailItem('תאריך אספקה משוער', shipment.eta));
-        }
-        if (shipment.vesselName) {
-            details.appendChild(createDetailItem('שם אונייה', shipment.vesselName));
-        }
-        if (shipment.documentUrl) {
-            const link = createLinkDetail('מסמכים', shipment.documentUrl);
-            details.appendChild(link);
-        }
-    }
+    });
 
     card.appendChild(header);
     card.appendChild(details);
