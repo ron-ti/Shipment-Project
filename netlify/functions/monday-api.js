@@ -203,11 +203,11 @@ exports.handler = async (event, context) => {
 
                 // Column text may contain multiple values (e.g., dropdown): "A, B"
                 const raw = customerIdColumn.text || '';
-                const parts = raw.split(/[,;\n]/).map(p => normalize(p));
+                const parts = raw.split(/[,;\n]/).map(p => normalize(p)).filter(Boolean);
                 if (parts.length === 0) return false;
 
-                // Match if any part equals or contains the requested id (tolerant)
-                return parts.some(p => p === normalizedRequested || p.includes(normalizedRequested) || normalizedRequested.includes(p));
+                // Strict match: any part must equal requested id exactly (after normalization)
+                return parts.some(p => p === normalizedRequested);
             })
             .map(item => {
                 // Map column values to shipment object
