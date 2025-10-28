@@ -55,15 +55,18 @@ exports.handler = async (event, context) => {
         // GraphQL query to fetch items from Monday.com
         const query = `
             query {
-                boards(ids: [${MONDAY_BOARD_ID}]) {
-                    items {
-                        id
-                        name
-                        column_values {
+                boards(ids: [${parseInt(MONDAY_BOARD_ID)}]) {
+                    items_page(limit: 500) {
+                        cursor
+                        items {
                             id
-                            title
-                            text
-                            value
+                            name
+                            column_values {
+                                id
+                                title
+                                text
+                                value
+                            }
                         }
                     }
                 }
@@ -129,7 +132,7 @@ exports.handler = async (event, context) => {
         ];
 
         // Process the data and filter by customer ID
-        const items = data.data.boards[0]?.items || [];
+        const items = data.data.boards[0]?.items_page?.items || [];
         const shipments = items
             .filter(item => {
                 // Find the Customer ID column
