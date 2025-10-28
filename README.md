@@ -186,6 +186,7 @@ monday-shipment-tracker/
 ## 🔒 Security
 
 - ✅ API token stored in environment variables (never exposed to client)
+- ✅ Admin-only mapping API protected by `ADMIN_TOKEN`
 - ✅ CORS headers configured for secure cross-origin requests
 - ✅ Server-side filtering by customer ID
 - ✅ No client-side secrets or credentials
@@ -218,6 +219,22 @@ monday-shipment-tracker/
 2. Check `netlify.toml` configuration
 3. Redeploy the site after making changes
 4. Check Netlify build logs
+
+## 🔑 Customer Unique Code Mapping
+
+Use the admin API to manage `uniqueId -> customerName` pairs.
+
+Environment variables to set in Netlify:
+
+- `ADMIN_TOKEN`: any strong string you choose
+- `BLOBS_READ_URL` and `BLOBS_WRITE_URL`: endpoints to read/write a JSON blob (you can replace these with your own storage or KV).
+
+Admin endpoints:
+
+- Resolve (public): `GET /.netlify/functions/customer-map?uniqueId=CODE`
+- Add/Update (admin): `POST /.netlify/functions/customer-map` with JSON `{ uniqueId, customerName }` and header `Authorization: Bearer ADMIN_TOKEN`
+- Delete (admin): `DELETE /.netlify/functions/customer-map` with JSON `{ uniqueId }` and header `Authorization: Bearer ADMIN_TOKEN`
+- List (admin): `GET /.netlify/functions/customer-map` with header `Authorization: Bearer ADMIN_TOKEN`
 
 ## 📝 License
 
