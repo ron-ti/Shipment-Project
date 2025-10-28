@@ -1,0 +1,6 @@
+לאחר יצירת ה-repository, רוץ את הפקודות הבאות:
+
+git remote add origin https://github.com/ron-ti/REPO-NAME.git
+git push -u origin main
+
+החלף REPO-NAME בשם שבו יצרת את ה-repository.

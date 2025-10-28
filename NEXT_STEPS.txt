@@ -1,0 +1,18 @@
+✅ שלב 2 הושלם - הקוד ב-GitHub!
+
+עכשיו:
+1. לך ל-Netlify: https://app.netlify.com
+2. Add new site > Import an existing project
+3. בחר GitHub
+4. חפש "Shipment Project"
+5. בחר אותו
+6. Deploy site
+
+לאחר הפרסום - לך ל:
+Site settings > Environment variables
+
+הוסף:
+- MONDAY_API_TOKEN
+- MONDAY_BOARD_ID
+
+ואז: Deploy > Redeploy site

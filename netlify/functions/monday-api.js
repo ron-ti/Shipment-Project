@@ -52,12 +52,12 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // GraphQL query to fetch items from Monday.com
+        // GraphQL query to fetch items from Monday.com  
         const query = `
             query {
                 boards(ids: [${parseInt(MONDAY_BOARD_ID)}]) {
+                    name
                     items_page(limit: 500) {
-                        cursor
                         items {
                             id
                             name
@@ -132,7 +132,26 @@ exports.handler = async (event, context) => {
         ];
 
         // Process the data and filter by customer ID
-        const items = data.data.boards[0]?.items_page?.items || [];
+        const board = data.data.boards[0];
+        if (!board) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ 
+                    error: 'Board not found. Please check Board ID.' 
+                }),
+            };
+        }
+        
+        const items = board.items_page?.items || [];
+        
+        if (items.length === 0) {
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({ shipments: [] }),
+            };
+        }
         const shipments = items
             .filter(item => {
                 // Find the Customer ID column
