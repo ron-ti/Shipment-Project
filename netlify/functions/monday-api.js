@@ -70,9 +70,10 @@ exports.handler = async (event, context) => {
         }
 
         // GraphQL query to fetch items from Monday.com  
+        const boardId = MONDAY_BOARD_ID.trim();
         const query = `
             query {
-                boards(ids: [${parseInt(MONDAY_BOARD_ID)}]) {
+                boards(ids: [${boardId}]) {
                     name
                     items_page(limit: 500) {
                         items {
@@ -89,6 +90,8 @@ exports.handler = async (event, context) => {
                 }
             }
         `;
+        
+        console.log('Query:', query);
 
         // Make request to Monday.com API
         const response = await fetch('https://api.monday.com/v2', {
