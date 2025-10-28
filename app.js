@@ -21,20 +21,29 @@ const customerName = document.getElementById('customerName');
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for customer ID in URL parameter
+    // Check for unique customer code in URL parameter (preferred)
     const urlParams = new URLSearchParams(window.location.search);
-    const customerIdFromUrl = urlParams.get('customer');
-    
-    if (customerIdFromUrl) {
-        loadShipments(customerIdFromUrl);
+    const uniqueId = urlParams.get('code');
+    if (uniqueId) {
+        resolveUniqueIdAndLoad(uniqueId);
+    } else {
+        // Fallback: legacy ?customer=
+        const customerIdFromUrl = urlParams.get('customer');
+        if (customerIdFromUrl) {
+            loadShipments(customerIdFromUrl);
+        }
     }
 
     // Handle form submission
     customerForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const customerId = customerIdInput.value.trim();
-        if (customerId) {
-            loadShipments(customerId);
+        const value = customerIdInput.value.trim();
+        if (!value) return;
+        if (value.includes('-') || value.length >= 4) {
+            // Treat as unique code by default
+            resolveUniqueIdAndLoad(value);
+        } else {
+            loadShipments(value);
         }
     });
 
@@ -89,6 +98,19 @@ async function loadShipments(customerId) {
 
     } catch (error) {
         console.error('Error loading shipments:', error);
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+    }
+}
+
+// Resolve uniqueId -> customerName via serverless mapping API
+async function resolveUniqueIdAndLoad(uniqueId) {
+    try {
+        const res = await fetch('/.netlify/functions/customer-map?uniqueId=' + encodeURIComponent(uniqueId));
+        if (!res.ok) throw new Error('Invalid code');
+        const { customerName } = await res.json();
+        loadShipments(customerName);
+    } catch (e) {
         loadingState.style.display = 'none';
         errorState.style.display = 'block';
     }
