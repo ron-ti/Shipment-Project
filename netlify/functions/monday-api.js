@@ -27,7 +27,21 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { customerId } = JSON.parse(event.body);
+        console.log('Event body:', event.body);
+        
+        let requestData;
+        try {
+            requestData = JSON.parse(event.body);
+        } catch (e) {
+            console.error('Failed to parse body:', e);
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'Invalid request format' }),
+            };
+        }
+        
+        const { customerId } = requestData;
 
         if (!customerId) {
             return {
@@ -40,6 +54,9 @@ exports.handler = async (event, context) => {
         // Get configuration from environment variables
         const MONDAY_API_TOKEN = process.env.MONDAY_API_TOKEN;
         const MONDAY_BOARD_ID = process.env.MONDAY_BOARD_ID;
+
+        console.log('API Token exists:', !!MONDAY_API_TOKEN);
+        console.log('Board ID:', MONDAY_BOARD_ID);
 
         if (!MONDAY_API_TOKEN || !MONDAY_BOARD_ID) {
             console.error('Missing environment variables');
