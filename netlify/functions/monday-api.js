@@ -177,21 +177,37 @@ exports.handler = async (event, context) => {
                 body: JSON.stringify({ shipments: [] }),
             };
         }
+        // Helper: normalize strings (remove spaces/punctuation, lowercase)
+        const normalize = (s) => (s || '')
+            .toString()
+            .toLowerCase()
+            .normalize('NFKD')
+            .replace(/[\u0590-\u05FF]/g, (c) => c) // keep Hebrew
+            .replace(/[^\p{L}\p{N}]+/gu, ' ')      // non letters/digits -> space
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        const normalizedRequested = normalize(customerId);
+
         const shipments = items
             .filter(item => {
-                // Find the Customer ID column
+                // Find the Customer ID column (supports titles like 'לקוח', 'Customer', 'Client')
                 const customerIdColumn = item.column_values.find(col => {
                     const title = col.column?.title?.toLowerCase() || '';
                     return CUSTOMER_ID_COLUMNS.some(customerIdTitle => 
                         title.includes(customerIdTitle) || title === customerIdTitle
                     );
                 });
-                
+
                 if (!customerIdColumn) return false;
-                
-                // Check if the customer ID matches
-                const itemCustomerId = customerIdColumn.text || '';
-                return itemCustomerId.trim().toLowerCase() === customerId.trim().toLowerCase();
+
+                // Column text may contain multiple values (e.g., dropdown): "A, B"
+                const raw = customerIdColumn.text || '';
+                const parts = raw.split(/[,;\n]/).map(p => normalize(p));
+                if (parts.length === 0) return false;
+
+                // Match if any part equals or contains the requested id (tolerant)
+                return parts.some(p => p === normalizedRequested || p.includes(normalizedRequested) || normalizedRequested.includes(p));
             })
             .map(item => {
                 // Map column values to shipment object
