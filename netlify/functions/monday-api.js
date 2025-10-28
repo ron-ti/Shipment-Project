@@ -133,6 +133,8 @@ exports.handler = async (event, context) => {
             'vessel': 'vesselName',
             'vessel name': 'vesselName',
             'status': 'status',
+            'shipment number': 'shipmentNumber',
+            'material category': 'materialCategory',
             
             // Hebrew column names - add your custom ones here
             'מס\' מכולה': 'containerNumber',
@@ -141,6 +143,8 @@ exports.handler = async (event, context) => {
             'תאריך אספקה מבוקש': 'requestedDeliveryDate',
             'תיאור': 'description',
             'חומר': 'material',
+            'קטגוריית חומר': 'materialCategory',
+            'מספר משלוח': 'shipmentNumber',
             
             // Documents and files
             'documents': 'documentUrl',
