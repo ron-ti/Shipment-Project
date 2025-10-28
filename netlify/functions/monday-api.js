@@ -107,6 +107,8 @@ exports.handler = async (event, context) => {
 
         const data = await response.json();
 
+        console.log('Monday API response:', JSON.stringify(data, null, 2));
+
         if (data.errors) {
             console.error('Monday API errors:', data.errors);
             return {
@@ -114,7 +116,8 @@ exports.handler = async (event, context) => {
                 headers,
                 body: JSON.stringify({ 
                     error: 'Failed to fetch data from Monday.com',
-                    details: data.errors[0]?.message 
+                    details: data.errors[0]?.message,
+                    allErrors: data.errors
                 }),
             };
         }
