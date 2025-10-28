@@ -81,7 +81,9 @@ exports.handler = async (event, context) => {
                             name
                             column_values {
                                 id
-                                title
+                                column {
+                                    title
+                                }
                                 text
                                 value
                             }
@@ -176,7 +178,7 @@ exports.handler = async (event, context) => {
             .filter(item => {
                 // Find the Customer ID column
                 const customerIdColumn = item.column_values.find(col => {
-                    const title = col.title?.toLowerCase() || '';
+                    const title = col.column?.title?.toLowerCase() || '';
                     return CUSTOMER_ID_COLUMNS.some(customerIdTitle => 
                         title.includes(customerIdTitle) || title === customerIdTitle
                     );
@@ -198,7 +200,8 @@ exports.handler = async (event, context) => {
 
                 // Extract specific column values based on configuration
                 item.column_values.forEach(col => {
-                    const title = col.title?.toLowerCase() || '';
+                    const title = col.column?.title?.toLowerCase() || '';
+                    const fullTitle = col.column?.title || '';
                     
                     // Check if this column should be displayed
                     for (const [columnKey, fieldName] of Object.entries(COLUMNS_TO_SHOW)) {
@@ -219,13 +222,13 @@ exports.handler = async (event, context) => {
                     }
                     
                     // Also check exact Hebrew title matches
-                    if (col.title === 'מס\' מכולה / בוקינג') {
+                    if (fullTitle === 'מס\' מכולה / בוקינג') {
                         shipment.columns.containerNumber = col.text || 'N/A';
                     }
-                    if (col.title === 'תאריך אספקה בוקינג ETA') {
+                    if (fullTitle === 'תאריך אספקה בוקינג ETA') {
                         shipment.columns.eta = col.text || 'N/A';
                     }
-                    if (col.title === 'Status') {
+                    if (fullTitle === 'Status') {
                         shipment.columns.status = col.text || 'N/A';
                     }
                 });
