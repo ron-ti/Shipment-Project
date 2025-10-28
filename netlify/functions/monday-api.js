@@ -157,7 +157,8 @@ exports.handler = async (event, context) => {
             'customer',
             'customer id',
             'client',
-            'לקוח'
+            'לקוח',
+            'לקוחות'
         ];
 
         // Process the data and filter by customer ID
