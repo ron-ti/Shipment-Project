@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מעקב משלוחים</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="logo">📦 מעקב משלוחים</h1>
+            <p class="subtitle">עקוב אחר המשלוחים שלך בזמן אמת</p>
+        </header>
+
+        <!-- Customer ID Input Section -->
+        <section class="customer-input-section" id="customerInputSection">
+            <div class="input-card">
+                <h2>הכנס מזהה לקוח</h2>
+                <form id="customerForm">
+                    <input 
+                        type="text" 
+                        id="customerIdInput" 
+                        placeholder="הכנס מזהה לקוח"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="btn btn-primary">הצג משלוחים</button>
+                </form>
+                <p class="info-text">אם יש לך קישור ישיר, מזהה הלקוח יטען אוטומטית.</p>
+            </div>
+        </section>
+
+        <!-- Shipments Display Section -->
+        <section class="shipments-section" id="shipmentsSection" style="display: none;">
+            <div class="section-header">
+                <h2 id="customerName">המשלוחים שלך</h2>
+                <button id="logoutBtn" class="btn btn-secondary">החלף לקוח</button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+                <div class="spinner"></div>
+                <p>טוען משלוחים...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <p>❌ לא ניתן לטעון משלוחים. נסה שוב מאוחר יותר.</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <p>לא נמצאו משלוחים למזהה לקוח זה.</p>
+            </div>
+
+            <!-- Shipments Grid -->
+            <div id="shipmentsGrid" class="shipments-grid"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

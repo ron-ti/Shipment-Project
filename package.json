@@ -1,0 +1,22 @@
+{
+  "name": "monday-shipment-tracker",
+  "version": "1.0.0",
+  "description": "A lightweight web application for tracking shipments using Monday.com as the data source",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests specified\"",
+    "dev": "netlify dev"
+  },
+  "keywords": [
+    "monday.com",
+    "shipment-tracking",
+    "netlify",
+    "serverless"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
+
