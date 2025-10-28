@@ -194,7 +194,7 @@ exports.handler = async (event, context) => {
 
         const normalizedRequested = normalize(customerId);
 
-        const shipments = items
+        let shipments = items
             .filter(item => {
                 // Find the Customer ID column (supports titles like 'לקוח', 'Customer', 'Client')
                 const customerIdColumn = item.column_values.find(col => {
@@ -259,6 +259,25 @@ exports.handler = async (event, context) => {
 
                 return shipment;
             });
+
+        // Fallback: if nothing found, try matching any column text that equals the customer
+        if (shipments.length === 0) {
+            const fallbackItems = items.filter(item => {
+                return item.column_values.some(col => normalize(col.text) === normalizedRequested);
+            });
+            shipments = fallbackItems.map(item => {
+                const shipment = { id: item.id, name: item.name, columns: {} };
+                item.column_values.forEach(col => {
+                    const title = col.column?.title?.toLowerCase() || '';
+                    if (title.includes('status')) shipment.columns.status = col.text || 'N/A';
+                    if (title.includes('eta')) shipment.columns.eta = col.text || 'N/A';
+                    if (title.includes('container') || col.column?.title === "מס' מכולה / בוקינג") shipment.columns.containerNumber = col.text || 'N/A';
+                    if (title.includes('material') || col.column?.title === 'קטגוריית חומר') shipment.columns.materialCategory = col.text || 'N/A';
+                    if (title.includes('shipment') || col.column?.title === 'מספר משלוח') shipment.columns.shipmentNumber = col.text || 'N/A';
+                });
+                return shipment;
+            });
+        }
 
         return {
             statusCode: 200,
